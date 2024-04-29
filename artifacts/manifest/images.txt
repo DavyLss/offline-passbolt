@@ -1,0 +1,2 @@
+passbolt/passbolt:latest-ce-non-root
+mariadb:10.11

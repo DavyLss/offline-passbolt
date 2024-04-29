@@ -1,0 +1,8 @@
+.env
+certs/*.crt
+certs/*.key
+!certs/*.example
+data/
+artifacts/images/*.tar
+artifacts/images/*.tar.gz
+artifacts/images/*.tar.zst

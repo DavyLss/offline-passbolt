@@ -1,0 +1,75 @@
+services:
+  db:
+    image: ${MARIADB_IMAGE}
+    container_name: passbolt-db
+    restart: unless-stopped
+    cpus: 1
+    mem_limit: 2g
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    environment:
+      MYSQL_RANDOM_ROOT_PASSWORD: ${DB_ROOT_RANDOM}
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      TZ: ${TIMEZONE}
+    volumes:
+      - ../data/db:/var/lib/mysql
+    networks:
+      - passbolt_backend
+
+  passbolt:
+    image: ${PASSBOLT_IMAGE}
+    container_name: passbolt
+    restart: unless-stopped
+    depends_on:
+      - db
+    cpus: 2
+    mem_limit: 3g
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    environment:
+      APP_FULL_BASE_URL: https://${PASSBOLT_FQDN}
+      DATASOURCES_DEFAULT_HOST: db
+      DATASOURCES_DEFAULT_USERNAME: ${DB_USER}
+      DATASOURCES_DEFAULT_PASSWORD: ${DB_PASSWORD}
+      DATASOURCES_DEFAULT_DATABASE: ${DB_NAME}
+      PASSBOLT_PLUGINS_SELF_REGISTRATION_ENABLED: "false"
+      PASSBOLT_KEY_NAME: ${PASSBOLT_KEY_NAME}
+      PASSBOLT_KEY_EMAIL: ${PASSBOLT_KEY_EMAIL}
+      PASSBOLT_KEY_LENGTH: ${PASSBOLT_KEY_LENGTH}
+      PASSBOLT_KEY_EXPIRATION: ${PASSBOLT_KEY_EXPIRATION}
+      EMAIL_DEFAULT_FROM_NAME: ${EMAIL_DEFAULT_FROM_NAME}
+      EMAIL_DEFAULT_FROM: ${EMAIL_DEFAULT_FROM}
+      EMAIL_TRANSPORT_DEFAULT_HOST: ${SMTP_HOST}
+      EMAIL_TRANSPORT_DEFAULT_PORT: ${SMTP_PORT}
+      EMAIL_TRANSPORT_DEFAULT_USERNAME: ${SMTP_USERNAME}
+      EMAIL_TRANSPORT_DEFAULT_PASSWORD: ${SMTP_PASSWORD}
+      EMAIL_TRANSPORT_DEFAULT_TLS: ${SMTP_TLS}
+      TZ: ${TIMEZONE}
+    command: ["/usr/bin/wait-for.sh", "-t", "0", "db:3306", "--", "/docker-entrypoint.sh"]
+    volumes:
+      - ../data/passbolt/gpg:/etc/passbolt/gpg
+      - ../data/passbolt/jwt:/etc/passbolt/jwt
+      - ../certs/passbolt.crt:/etc/passbolt/certs/certificate.crt:ro
+      - ../certs/passbolt.key:/etc/passbolt/certs/certificate.key:ro
+    ports:
+      - "${PASSBOLT_HTTP_PORT}:8080"
+      - "${PASSBOLT_HTTPS_PORT}:4433"
+    networks:
+      - passbolt_backend
+    healthcheck:
+      test: ["CMD-SHELL", "curl -kfsS https://localhost:4433/healthcheck/status.json >/dev/null || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 20
+      start_period: 120s
+
+networks:
+  passbolt_backend:
+    driver: bridge
+    internal: true
