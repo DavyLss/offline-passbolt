@@ -56,7 +56,10 @@ Cette stack est pensée pour un **gestionnaire de secrets interne** :
 - Le blocage réel de la sortie Internet doit être appliqué au niveau **pare-feu hôte / ACL réseau**.
 
 ## Ressources cibles recommandées
-Pour une petite équipe, jusqu'à environ **20 utilisateurs** :
+Le sizing V1 actuellement intégré dans les compose correspond à une **petite équipe** :
+- environ **20 à 30 comptes** au total ;
+- environ **5 à 10 utilisateurs actifs simultanément** ;
+- usage standard Passbolt : consultation, partage, mise à jour de secrets, sans charge inhabituelle.
 
 ### Hôte
 - **4 vCPU**
@@ -70,6 +73,11 @@ Pour une petite équipe, jusqu'à environ **20 utilisateurs** :
 ### MariaDB
 - **1 vCPU max**
 - **2 Go RAM max**
+
+### Lecture rapide
+- profil actuel = **petite équipe / PME légère** ;
+- adapté à plusieurs sessions web simultanées ;
+- si le client vise une équipe plus large ou une simultanéité plus forte, prévoir un profil supérieur.
 
 ## Structure du dépôt
 - `compose/` : définitions Docker Compose / Podman Compose
