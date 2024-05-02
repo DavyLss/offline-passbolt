@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-source ./.env
+source ./scripts/lib-env.sh
+load_env_file ./.env
 
 for i in $(seq 1 90); do
   if curl -kfsS "https://${PASSBOLT_FQDN}:${PASSBOLT_HTTPS_PORT}/healthcheck/status.json" >/dev/null 2>&1; then

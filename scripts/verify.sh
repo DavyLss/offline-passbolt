@@ -2,7 +2,8 @@
 set -euo pipefail
 
 ENGINE="${1:-docker}"
-source ./.env
+source ./scripts/lib-env.sh
+load_env_file ./.env
 
 echo "[+] HTTPS healthcheck"
 curl -kfsS "https://${PASSBOLT_FQDN}:${PASSBOLT_HTTPS_PORT}/healthcheck/status.json"

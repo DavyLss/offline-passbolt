@@ -11,6 +11,7 @@ if [ ! -f certs/passbolt.crt ] || [ ! -f certs/passbolt.key ]; then
   exit 1
 fi
 
+chmod 644 certs/passbolt.crt certs/passbolt.key
 mkdir -p data/passbolt/gpg data/passbolt/jwt data/db
 
 echo "[+] Preflight OK"

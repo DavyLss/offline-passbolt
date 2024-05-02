@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-source ./.env
+source ./scripts/lib-env.sh
+load_env_file ./.env
+
 mkdir -p artifacts/images artifacts/manifest artifacts/checksums
 
 docker pull "${PASSBOLT_IMAGE}"

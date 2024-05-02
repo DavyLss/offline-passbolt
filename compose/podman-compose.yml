@@ -5,10 +5,6 @@ services:
     restart: unless-stopped
     cpus: 1
     mem_limit: 2g
-    security_opt:
-      - no-new-privileges:true
-    cap_drop:
-      - ALL
     environment:
       MYSQL_RANDOM_ROOT_PASSWORD: ${DB_ROOT_RANDOM}
       MYSQL_DATABASE: ${DB_NAME}
@@ -16,7 +12,7 @@ services:
       MYSQL_PASSWORD: ${DB_PASSWORD}
       TZ: ${TIMEZONE}
     volumes:
-      - ../data/db:/var/lib/mysql:Z
+      - passbolt_db:/var/lib/mysql:Z
     networks:
       - passbolt_backend
 
@@ -53,8 +49,8 @@ services:
       TZ: ${TIMEZONE}
     command: ["/usr/bin/wait-for.sh", "-t", "0", "db:3306", "--", "/docker-entrypoint.sh"]
     volumes:
-      - ../data/passbolt/gpg:/etc/passbolt/gpg:Z
-      - ../data/passbolt/jwt:/etc/passbolt/jwt:Z
+      - passbolt_gpg:/etc/passbolt/gpg:Z
+      - passbolt_jwt:/etc/passbolt/jwt:Z
       - ../certs/passbolt.crt:/etc/passbolt/certs/certificate.crt:ro,Z
       - ../certs/passbolt.key:/etc/passbolt/certs/certificate.key:ro,Z
     ports:
@@ -73,3 +69,8 @@ networks:
   passbolt_backend:
     driver: bridge
     internal: true
+
+volumes:
+  passbolt_db:
+  passbolt_gpg:
+  passbolt_jwt:
