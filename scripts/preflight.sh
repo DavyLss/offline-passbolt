@@ -6,12 +6,16 @@ if [ ! -f .env ]; then
   exit 1
 fi
 
+source ./scripts/lib-env.sh
+load_env_file ./.env
+
 if [ ! -f certs/passbolt.crt ] || [ ! -f certs/passbolt.key ]; then
-  echo "Missing TLS certificate files in certs/passbolt.crt and certs/passbolt.key"
-  exit 1
+  echo "[!] Missing TLS certificate files, generating a local self-signed certificate for ${PASSBOLT_FQDN}"
+  ./scripts/generate-self-signed-cert.sh
 fi
 
-chmod 644 certs/passbolt.crt certs/passbolt.key
+chmod 644 certs/passbolt.crt
+chmod 600 certs/passbolt.key
 mkdir -p data/passbolt/gpg data/passbolt/jwt data/db
 
 echo "[+] Preflight OK"

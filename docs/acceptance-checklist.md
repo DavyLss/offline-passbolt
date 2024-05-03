@@ -1,49 +1,52 @@
-# Checklist de recette / validation
+# Acceptance checklist
 
-## 1. Pré-requis hôte
-- [ ] Docker ou Podman est installé.
-- [ ] Le FQDN interne de Passbolt est résolu correctement.
-- [ ] L'instance n'est pas exposée sur Internet.
-- [ ] Les certificats TLS internes sont disponibles.
+This checklist helps validate that an offline installation of `offline-passbolt` is usable and ready for handover.
 
-## 2. Bundle offline
-- [ ] Les archives `.tar` sont présentes dans `artifacts/images/`.
-- [ ] `artifacts/manifest/images.txt` est cohérent.
-- [ ] `artifacts/checksums/SHA256SUMS` est présent.
-- [ ] Les checksums ont été vérifiés.
+## 1. Host prerequisites
+- [ ] Docker or Podman is installed
+- [ ] the internal Passbolt FQDN resolves correctly
+- [ ] the instance is not exposed to the Internet
+- [ ] internal TLS certificates are available, or the self-signed fallback is explicitly accepted for lab use
+
+## 2. Offline bundle
+- [ ] `.tar` archives are present in `artifacts/images/`
+- [ ] `artifacts/manifest/images.txt` is coherent
+- [ ] `artifacts/checksums/SHA256SUMS` is present
+- [ ] checksums were verified
 
 ## 3. Configuration
-- [ ] `.env` a été créé.
-- [ ] `PASSBOLT_FQDN` est correct.
-- [ ] `DB_PASSWORD` a été personnalisé.
-- [ ] Les certificats internes ont été déposés.
-- [ ] Les tags d'images correspondent au bundle.
+- [ ] `.env` was created from `.env.example`
+- [ ] `PASSBOLT_FQDN` is correct
+- [ ] `DB_PASSWORD` was customized
+- [ ] image tags match the delivered bundle
+- [ ] TLS mode was chosen, internal certificate or self-signed lab fallback
 
 ## 4. Installation
-- [ ] `./scripts/install.sh docker` ou `./scripts/install.sh podman` réussit.
-- [ ] Le conteneur `passbolt` est sain.
-- [ ] Le conteneur `passbolt-db` est sain.
+- [ ] `./scripts/install.sh docker` or `./scripts/install.sh podman` succeeds
+- [ ] the `passbolt` container is healthy
+- [ ] the `passbolt-db` container is healthy
 
-## 5. Santé applicative
-- [ ] `./scripts/verify.sh <engine>` réussit.
-- [ ] `https://<PASSBOLT_FQDN>/healthcheck/status.json` répond.
-- [ ] L'interface web est accessible depuis le réseau interne.
+## 5. Application health
+- [ ] `./scripts/verify.sh <engine>` succeeds
+- [ ] `https://<PASSBOLT_FQDN>/healthcheck/status.json` responds
+- [ ] the web interface is reachable from the internal network
 
-## 6. Bootstrap administrateur
-- [ ] `./scripts/bootstrap-admin.sh <engine>` réussit.
-- [ ] Le lien d'initialisation administrateur est généré.
-- [ ] Le premier administrateur finalise son enregistrement.
+## 6. Administrator bootstrap
+- [ ] `./scripts/bootstrap-admin.sh <engine>` succeeds
+- [ ] the administrator setup link is generated
+- [ ] the first administrator completes registration
 
-## 7. Sécurité
-- [ ] L'auto-inscription est désactivée.
-- [ ] HTTPS interne est opérationnel.
-- [ ] Les accès réseau sont limités aux segments internes autorisés.
-- [ ] Le plan de blocage egress Internet est appliqué côté hôte / réseau.
-- [ ] Une politique MFA est activée après mise en service.
+## 7. Security
+- [ ] self-registration is disabled
+- [ ] internal HTTPS is operational
+- [ ] network access is limited to approved internal segments
+- [ ] the no-Internet-egress plan is enforced on the host or network
+- [ ] MFA policy is enabled after go-live
+- [ ] production deployments do not rely on the self-signed fallback
 
-## 8. Critères d'acceptation finaux
-- [ ] installation réalisable sans Internet ;
-- [ ] interface Passbolt accessible en HTTPS ;
-- [ ] premier administrateur créé ;
-- [ ] base et clés persistées correctement ;
-- [ ] aucune dépendance Internet requise pour l'usage nominal prévu.
+## 8. Final acceptance criteria
+- [ ] installation is achievable without Internet
+- [ ] the Passbolt interface is reachable over HTTPS
+- [ ] the first administrator was created
+- [ ] database and cryptographic materials persist correctly
+- [ ] no Internet dependency is required for intended normal use

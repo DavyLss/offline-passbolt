@@ -1,18 +1,21 @@
 # Security
 
-## Paramètres retenus
-- image Passbolt non-root
-- HTTPS interne obligatoire
-- auto-inscription désactivée
-- MariaDB isolée sur un réseau backend interne
-- volumes persistants séparés pour GPG, JWT et base de données
-- `no-new-privileges` sur les conteneurs
-- `cap_drop: ALL` sur les conteneurs
-- limites CPU/RAM sur Passbolt et MariaDB
+## Security choices in V1
 
-## Recommandations complémentaires
-- imposer une politique MFA côté Passbolt après bootstrap
-- utiliser un certificat interne signé par l'AC de l'entreprise
-- limiter l'accès réseau aux seuls segments internes autorisés
-- sauvegarder régulièrement la base, les clés GPG et les secrets JWT
-- ne jamais exposer l'instance sur Internet
+- Passbolt non-root image
+- internal HTTPS required
+- self-registration disabled
+- MariaDB isolated on an internal backend network
+- separate persistent volumes for GPG, JWT, and database data
+- `no-new-privileges` on containers
+- `cap_drop: ALL` on containers
+- CPU and RAM limits on Passbolt and MariaDB
+
+## Additional recommendations
+
+- require MFA in Passbolt after bootstrap
+- use an internal CA-signed certificate for production
+- limit network access to approved internal segments only
+- back up the database, GPG keys, and JWT secrets regularly
+- never expose the instance to the public Internet
+- treat the self-signed certificate fallback as non-production only

@@ -1,93 +1,81 @@
 # offline-passbolt
 
-Déploiement **offline** de **Passbolt CE** pour un environnement **on-premise** sans dépendance Internet à l'installation.
+Offline Passbolt CE stack for network-isolated, on-premise environments.
 
-## Objectif
-Ce projet fournit une base reproductible pour livrer au client une instance **Passbolt CE** :
-- **100% hors connexion** côté installation ;
-- compatible **Docker Compose** et **Podman Compose** ;
-- **HTTPS interne obligatoire** ;
-- configuration de sécurité de base renforcée ;
-- bundle d'images offline, scripts d'installation, documentation et recette.
+This project is built for installations that must work **without Internet access** on the target site while still keeping a strong baseline for HTTPS, secret storage, and operational handover.
 
-## Cas d'usage visé
-Cette stack est pensée pour un **gestionnaire de secrets interne** :
-- hébergé dans le réseau privé du client ;
-- sans exposition Internet ;
-- avec certificats TLS internes ;
-- avec dépendances réseau limitées au strict nécessaire ;
-- installable sans téléchargement supplémentaire sur le site cible.
+## Why this project exists
 
-## Périmètre V1
-### Inclus
-- Passbolt CE en conteneur **non-root**
-- MariaDB dédiée
-- compatibilité **Docker Compose** / **Podman Compose**
-- préparation d'un bundle d'images offline
-- scripts d'installation, bootstrap et vérification
-- bootstrap du premier administrateur
-- documentation sécurité
-- checklist de validation
+Some customers need a local secret manager that can be:
+- installed fully offline
+- hosted only on the internal network
+- integrated with internal TLS certificates
+- delivered with repeatable deployment steps
 
-### Non inclus
-- installation de Docker ou Podman sur l'hôte
-- émission automatique de certificats
-- accès Internet sortant
-- SMTP externe public
-- haute disponibilité
-- base de données externe
-- supervision avancée
-- SSO / LDAP / annuaire
-- sauvegardes automatisées prêtes à l'emploi
+The goal is not to ship a complete enterprise secret platform. The goal is to provide a **practical offline-ready Passbolt base** for small internal teams.
 
-## Hypothèses
-- Docker ou Podman est déjà installé sur la machine cible.
-- Le client fournit un **FQDN interne**.
-- Le client fournit un **certificat TLS interne** valide pour ce FQDN.
-- Aucun téléchargement n'est autorisé pendant l'installation.
-- L'instance n'est pas exposée sur Internet.
-- Si l'email est utilisé, il passe par un **SMTP interne**.
+## What it includes
 
-## Architecture résumée
-- **Passbolt CE** publie l'interface web en HTTPS sur le réseau interne.
-- **MariaDB** n'est jamais exposée hors du réseau de backend.
-- Les certificats TLS sont fournis localement via `certs/`.
-- Les conteneurs utilisent un réseau dédié ; la base reste isolée.
-- Le blocage réel de la sortie Internet doit être appliqué au niveau **pare-feu hôte / ACL réseau**.
+- Passbolt CE in non-root container mode
+- dedicated MariaDB container
+- Docker Compose and Podman Compose deployment files
+- offline image bundle preparation
+- install, bootstrap, and verification scripts
+- internal HTTPS support
+- basic container hardening
+- installation, security, and acceptance documentation
 
-## Ressources cibles recommandées
-Le sizing V1 actuellement intégré dans les compose correspond à une **petite équipe** :
-- environ **20 à 30 comptes** au total ;
-- environ **5 à 10 utilisateurs actifs simultanément** ;
-- usage standard Passbolt : consultation, partage, mise à jour de secrets, sans charge inhabituelle.
+## What it does not include
 
-### Hôte
-- **4 vCPU**
-- **8 Go RAM**
-- **100 Go SSD**
+- Docker or Podman installation on the host
+- automatic certificate issuance
+- Internet egress dependencies
+- public SMTP service
+- high availability
+- external database
+- advanced monitoring stack
+- SSO, LDAP, or directory integration
+- ready-made automated backups
+
+## Typical use case
+
+This stack is intended for an **internal password and secret-sharing service**:
+- hosted on a customer private network
+- not exposed to the Internet
+- installed from pre-exported images
+- operated with internal DNS and internal TLS
+
+## Recommended target sizing
+
+Current compose defaults fit a **small team**:
+- about 20 to 30 accounts
+- about 5 to 10 simultaneous active users
+- standard Passbolt usage, browsing, sharing, updating secrets
+
+### Host
+- 4 vCPU
+- 8 GB RAM
+- 100 GB SSD
 
 ### Passbolt
-- **2 vCPU max**
-- **3 Go RAM max**
+- 2 vCPU max
+- 3 GB RAM max
 
 ### MariaDB
-- **1 vCPU max**
-- **2 Go RAM max**
+- 1 vCPU max
+- 2 GB RAM max
 
-### Lecture rapide
-- profil actuel = **petite équipe / PME légère** ;
-- adapté à plusieurs sessions web simultanées ;
-- si le client vise une équipe plus large ou une simultanéité plus forte, prévoir un profil supérieur.
+## Repository structure
 
-## Structure du dépôt
-- `compose/` : définitions Docker Compose / Podman Compose
-- `scripts/` : préflight, import d'images, installation, bootstrap admin, vérification
-- `artifacts/` : images exportées, manifest, checksums
-- `certs/` : certificats internes à déposer localement
-- `docs/` : architecture, sécurité, installation offline, egress control, recette
+- `compose/`, Docker Compose and Podman Compose definitions
+- `scripts/`, preflight, image import, install, bootstrap, verify, and helper scripts
+- `artifacts/`, exported images, manifests, and checksums
+- `certs/`, local TLS certificate drop-in directory, not versioned
+- `docs/`, architecture, security, offline installation, egress control, and acceptance docs
 
-## Préparation du bundle offline
-Sur une machine disposant d'un accès Internet :
+## Quick start
+
+### 1. Prepare the offline bundle on a connected machine
 
 ```bash
 cp .env.example .env
@@ -95,30 +83,31 @@ $EDITOR .env
 ./scripts/prepare-bundle.sh
 ```
 
-Ce script :
-- télécharge les images définies dans `.env` ;
-- les exporte dans `artifacts/images/` ;
-- génère `artifacts/manifest/images.txt` ;
-- génère `artifacts/checksums/SHA256SUMS`.
+Then transfer the repository and image archives to the target site.
 
-Ensuite, transférer le dépôt et les archives d'images sur le site client.
+### 2. Prepare the target configuration
 
-## Installation offline
-### 1. Préparer la configuration
 ```bash
 cp .env.example .env
 $EDITOR .env
 ```
 
-### 2. Déposer les certificats internes
-```bash
-cp certs/passbolt.crt.example certs/passbolt.crt
-cp certs/passbolt.key.example certs/passbolt.key
-# remplacer ensuite les fichiers example par les vrais certificats internes
-```
+### 3. TLS certificate handling
 
-### 3. Lancer l'installation
+Recommended production mode:
+- provide `certs/passbolt.crt`
+- provide `certs/passbolt.key`
+- use an internal certificate matching `PASSBOLT_FQDN`
+
+Fallback lab mode:
+- if no certificate files are present, `preflight.sh` generates a **local self-signed certificate** automatically
+- this is suitable for tests, demos, and isolated validation
+- replace it before production handover
+
+### 4. Install
+
 #### Docker
+
 ```bash
 ./scripts/install.sh docker
 ./scripts/bootstrap-admin.sh docker
@@ -126,75 +115,69 @@ cp certs/passbolt.key.example certs/passbolt.key
 ```
 
 #### Podman
+
 ```bash
 ./scripts/install.sh podman
 ./scripts/bootstrap-admin.sh podman
 ./scripts/verify.sh podman
 ```
 
-## Variables principales à adapter
-Dans `.env` :
-- `PASSBOLT_FQDN` : nom DNS interne de l'instance
-- `PASSBOLT_HTTP_PORT` : port HTTP exposé
-- `PASSBOLT_HTTPS_PORT` : port HTTPS exposé
-- `PASSBOLT_IMAGE` : image Passbolt CE
-- `MARIADB_IMAGE` : image MariaDB
-- `DB_NAME`, `DB_USER`, `DB_PASSWORD` : paramètres de base de données
-- `PASSBOLT_KEY_*` : identité de la clé serveur GPG
-- `FIRST_ADMIN_*` : bootstrap du premier administrateur
-- `SMTP_*` : serveur mail interne, si utilisé
+## Main variables to review
 
-## Sécurité retenue en V1
-- image Passbolt **non-root** ;
-- HTTPS interne obligatoire ;
-- base MariaDB isolée sur réseau backend ;
-- auto-inscription désactivée ;
-- volumes persistants dédiés pour GPG / JWT / base ;
-- pas d'exposition Internet ;
-- dépendances externes supprimées du flux d'installation ;
-- durcissement conteneur de base (`no-new-privileges`, `cap_drop`, limites CPU/RAM).
+In `.env`:
+- `PASSBOLT_FQDN`, internal DNS name of the instance
+- `PASSBOLT_HTTP_PORT`, exposed HTTP port
+- `PASSBOLT_HTTPS_PORT`, exposed HTTPS port
+- `PASSBOLT_IMAGE`, Passbolt CE image
+- `MARIADB_IMAGE`, MariaDB image
+- `DB_NAME`, `DB_USER`, `DB_PASSWORD`, database parameters
+- `PASSBOLT_KEY_*`, Passbolt server GPG key identity settings
+- `FIRST_ADMIN_*`, first administrator bootstrap values
+- `SMTP_*`, internal mail server settings if used
 
-## Zéro sortie Internet
-Le projet est pensé pour fonctionner sans accès Internet pendant l'installation et l'usage nominal.
+## Security model, V1
 
-Cependant, le **blocage réel de l'egress Internet** doit être appliqué côté client :
-- pare-feu hôte ;
-- ACL réseau ;
-- micro-segmentation ;
-- autorisation limitée aux services internes nécessaires (DNS, NTP, SMTP interne si utilisé).
+- Passbolt non-root image
+- internal HTTPS required
+- MariaDB isolated on a backend-only network
+- self-registration disabled
+- dedicated persistent volumes for GPG, JWT, and database data
+- no Internet exposure
+- no external download dependency during installation
+- basic container hardening, `no-new-privileges`, `cap_drop`, CPU and RAM limits
 
-Voir : `docs/no-internet-egress.md`
+## No Internet egress
 
-## Validation
-Une checklist de recette est fournie ici :
-- `docs/acceptance-checklist.md`
+The project is designed to work without Internet access during installation and normal operation.
 
-Elle permet de vérifier notamment :
-- les prérequis hôte ;
-- l'intégrité du bundle offline ;
-- la santé de Passbolt ;
-- le bootstrap du premier administrateur ;
-- le bon fonctionnement HTTPS ;
-- l'absence de dépendance Internet pour le fonctionnement attendu.
+However, the **actual enforcement** of blocked Internet egress must still be applied by the customer at host or network level:
+- host firewall
+- network ACLs
+- micro-segmentation
+- allow-list of required internal services only, DNS, NTP, internal SMTP if needed
 
-## Limites connues de la V1
-- le blocage de la sortie Internet doit être appliqué par le client au niveau réseau/hôte ;
-- pas d'intégration d'annuaire/SSO dans cette V1 ;
-- pas de sauvegarde automatisée livrée dans la base du projet ;
-- pas de rotation automatique des certificats ;
-- validation runtime réelle à exécuter sur une machine disposant de Docker ou Podman.
+See `docs/no-internet-egress.md`.
 
-## Documentation complémentaire
+## Known V1 limits
+
+- outbound Internet blocking must be enforced outside the repo, on host or network controls
+- no directory integration or SSO in this V1
+- no automated backup workflow included by default
+- no automatic certificate rotation
+- production use should replace the self-signed fallback with customer PKI certificates
+
+## Documentation
+
 - `docs/architecture.md`
 - `docs/install-offline.md`
 - `docs/security.md`
 - `docs/no-internet-egress.md`
 - `docs/acceptance-checklist.md`
 
-## Suite recommandée
-Après validation de la V1, les évolutions naturelles sont :
-- guide d'exploitation client ;
-- procédure de sauvegarde/restauration ;
-- procédure d'upgrade offline ;
-- durcissement complémentaire ;
-- intégration éventuelle MFA/SSO/annuaire selon le besoin du client.
+## Recommended next steps after V1
+
+- add customer operations runbooks
+- define backup and restore procedures
+- document offline upgrade workflows
+- add extra hardening and governance controls
+- integrate MFA, SSO, or directory services when required

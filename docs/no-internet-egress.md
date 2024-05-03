@@ -1,26 +1,30 @@
-# Zéro sortie Internet
+# No Internet egress
 
-Le projet est conçu pour fonctionner **sans téléchargement ni dépendance Internet** au moment de l'installation et de l'exploitation nominale.
+The repository is designed to avoid Internet downloads during installation and intended day-to-day operation.
 
-## Ce que le dépôt couvre
-- bundle d'images offline
-- aucune dépendance SaaS obligatoire
-- base MariaDB isolée
-- réseau backend Docker/Podman marqué `internal`
+## What the repository covers
 
-## Ce que le client doit encore faire
-Docker/Podman ne garantit pas à lui seul une interdiction fine de sortie Internet tout en autorisant l'accès LAN.
-Le **blocage effectif de l'egress Internet** doit être appliqué :
-- au niveau du pare-feu de l'hôte ;
-- ou via ACL réseau / micro-segmentation ;
-- en autorisant seulement les flux internes explicitement nécessaires (DNS interne, NTP interne, SMTP interne si utilisé).
+- offline image bundle preparation
+- no mandatory SaaS dependency
+- isolated MariaDB backend network
+- local deployment assets only
 
-## Politique recommandée
-Autoriser seulement :
-- DNS interne
-- NTP interne
-- SMTP interne si nécessaire
-- accès HTTPS/HTTP depuis les postes clients internes vers Passbolt
+## What the customer must still enforce
 
-Refuser :
-- toute sortie vers Internet public depuis l'hôte ou les sous-réseaux de conteneurs.
+Docker or Podman alone does not fully enforce a precise no-Internet policy while preserving internal LAN access.
+
+The effective egress block must still be implemented with:
+- host firewall rules
+- network ACLs or micro-segmentation
+- explicit allow-lists for required internal services only, DNS, NTP, internal SMTP if needed
+
+## Recommended policy
+
+Allow only:
+- internal DNS
+- internal NTP
+- internal SMTP if required
+- client access from approved internal segments to the Passbolt service
+
+Deny:
+- any outbound access to the public Internet from the host or container networks

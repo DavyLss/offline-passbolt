@@ -1,7 +1,7 @@
 .env
 certs/*.crt
 certs/*.key
-!certs/*.example
+!certs/.gitkeep
 data/
 artifacts/images/*.tar
 artifacts/images/*.tar.gz
