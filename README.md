@@ -1,20 +1,20 @@
 # offline-passbolt
 
-Offline Passbolt CE stack for network-isolated, on-premise environments.
+A simple offline Passbolt CE stack for on-premise environments.
 
-This project is built for installations that must work **without Internet access** on the target site while still keeping a strong baseline for HTTPS, secret storage, and operational handover.
+This repository is built for installations that must work without Internet access on the target site.
 
-## Why this project exists
+## What this is for
 
-Some customers need a local secret manager that can be:
-- installed fully offline
-- hosted only on the internal network
-- integrated with internal TLS certificates
-- delivered with repeatable deployment steps
+Use it when you need an internal secret manager that can be:
+- deployed fully offline
+- kept on a private network
+- exposed only over internal HTTPS
+- handed over with clear and repeatable steps
 
-The goal is not to ship a complete enterprise secret platform. The goal is to provide a **practical offline-ready Passbolt base** for small internal teams.
+The goal is to provide a solid, practical base for a small team, not a full enterprise platform.
 
-## What it includes
+## What is included
 
 - Passbolt CE in non-root container mode
 - dedicated MariaDB container
@@ -23,34 +23,33 @@ The goal is not to ship a complete enterprise secret platform. The goal is to pr
 - install, bootstrap, and verification scripts
 - internal HTTPS support
 - basic container hardening
-- installation, security, and acceptance documentation
+- documentation for install, security, and acceptance
 
-## What it does not include
+## What is not included
 
 - Docker or Podman installation on the host
 - automatic certificate issuance
-- Internet egress dependencies
 - public SMTP service
 - high availability
 - external database
-- advanced monitoring stack
+- advanced monitoring
 - SSO, LDAP, or directory integration
 - ready-made automated backups
 
 ## Typical use case
 
-This stack is intended for an **internal password and secret-sharing service**:
-- hosted on a customer private network
+This stack fits a private internal Passbolt service:
+- hosted on a customer network
 - not exposed to the Internet
 - installed from pre-exported images
 - operated with internal DNS and internal TLS
 
-## Recommended target sizing
+## Recommended sizing
 
-Current compose defaults fit a **small team**:
+Current defaults fit a small team:
 - about 20 to 30 accounts
 - about 5 to 10 simultaneous active users
-- standard Passbolt usage, browsing, sharing, updating secrets
+- standard Passbolt usage, browsing, sharing, and updating secrets
 
 ### Host
 - 4 vCPU
@@ -65,13 +64,13 @@ Current compose defaults fit a **small team**:
 - 1 vCPU max
 - 2 GB RAM max
 
-## Repository structure
+## Repository layout
 
-- `compose/`, Docker Compose and Podman Compose definitions
-- `scripts/`, preflight, image import, install, bootstrap, verify, and helper scripts
-- `artifacts/`, exported images, manifests, and checksums
-- `certs/`, local TLS certificate drop-in directory, not versioned
-- `docs/`, architecture, security, offline installation, egress control, and acceptance docs
+- `compose/` - Docker Compose and Podman Compose files
+- `scripts/` - preflight, import, install, bootstrap, verify, helpers
+- `artifacts/` - exported images, manifests, checksums
+- `certs/` - local TLS drop-in directory, not versioned
+- `docs/` - architecture, security, install, egress control, acceptance
 
 ## Quick start
 
@@ -92,17 +91,16 @@ cp .env.example .env
 $EDITOR .env
 ```
 
-### 3. TLS certificate handling
+### 3. TLS handling
 
-Recommended production mode:
-- provide `certs/passbolt.crt`
-- provide `certs/passbolt.key`
-- use an internal certificate matching `PASSBOLT_FQDN`
+For production, provide:
+- `certs/passbolt.crt`
+- `certs/passbolt.key`
 
-Fallback lab mode:
-- if no certificate files are present, `preflight.sh` generates a **local self-signed certificate** automatically
-- this is suitable for tests, demos, and isolated validation
-- replace it before production handover
+These should match `PASSBOLT_FQDN` and come from the customer's internal PKI when possible.
+
+If no certificate files are present, `preflight.sh` generates a local self-signed certificate automatically.
+That fallback is useful for lab, demo, or validation use. It should be replaced before production handover.
 
 ### 4. Install
 
@@ -122,49 +120,50 @@ Fallback lab mode:
 ./scripts/verify.sh podman
 ```
 
-## Main variables to review
+## Main variables
 
-In `.env`:
-- `PASSBOLT_FQDN`, internal DNS name of the instance
-- `PASSBOLT_HTTP_PORT`, exposed HTTP port
-- `PASSBOLT_HTTPS_PORT`, exposed HTTPS port
-- `PASSBOLT_IMAGE`, Passbolt CE image
-- `MARIADB_IMAGE`, MariaDB image
-- `DB_NAME`, `DB_USER`, `DB_PASSWORD`, database parameters
-- `PASSBOLT_KEY_*`, Passbolt server GPG key identity settings
-- `FIRST_ADMIN_*`, first administrator bootstrap values
-- `SMTP_*`, internal mail server settings if used
+Review these values in `.env`:
+- `PASSBOLT_FQDN`
+- `PASSBOLT_HTTP_PORT`
+- `PASSBOLT_HTTPS_PORT`
+- `PASSBOLT_IMAGE`
+- `MARIADB_IMAGE`
+- `DB_NAME`
+- `DB_USER`
+- `DB_PASSWORD`
+- `PASSBOLT_KEY_*`
+- `FIRST_ADMIN_*`
+- `SMTP_*`
 
-## Security model, V1
+## Security notes
 
-- Passbolt non-root image
-- internal HTTPS required
-- MariaDB isolated on a backend-only network
-- self-registration disabled
-- dedicated persistent volumes for GPG, JWT, and database data
-- no Internet exposure
-- no external download dependency during installation
-- basic container hardening, `no-new-privileges`, `cap_drop`, CPU and RAM limits
+- Passbolt runs in non-root mode
+- internal HTTPS is required
+- self-registration is disabled
+- MariaDB stays on a backend-only network
+- persistent data is separated for database, GPG, and JWT material
+- basic hardening is applied with `no-new-privileges`, `cap_drop`, CPU and RAM limits
 
 ## No Internet egress
 
-The project is designed to work without Internet access during installation and normal operation.
+The repository avoids Internet downloads during installation and normal use.
 
-However, the **actual enforcement** of blocked Internet egress must still be applied by the customer at host or network level:
+Actual egress blocking still has to be enforced outside the repo, at host or network level:
 - host firewall
 - network ACLs
 - micro-segmentation
-- allow-list of required internal services only, DNS, NTP, internal SMTP if needed
+- allow-list for required internal services only
 
 See `docs/no-internet-egress.md`.
 
-## Known V1 limits
+## Limits
 
-- outbound Internet blocking must be enforced outside the repo, on host or network controls
-- no directory integration or SSO in this V1
-- no automated backup workflow included by default
+This is a focused V1.
+
+- no directory integration or SSO
+- no built-in backup workflow
 - no automatic certificate rotation
-- production use should replace the self-signed fallback with customer PKI certificates
+- production deployments should replace the self-signed TLS fallback
 
 ## Documentation
 
@@ -173,11 +172,3 @@ See `docs/no-internet-egress.md`.
 - `docs/security.md`
 - `docs/no-internet-egress.md`
 - `docs/acceptance-checklist.md`
-
-## Recommended next steps after V1
-
-- add customer operations runbooks
-- define backup and restore procedures
-- document offline upgrade workflows
-- add extra hardening and governance controls
-- integrate MFA, SSO, or directory services when required
