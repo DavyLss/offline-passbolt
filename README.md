@@ -1,18 +1,18 @@
 # offline-passbolt
 
-A simple offline Passbolt CE stack for on-premise environments.
+A small offline Passbolt CE stack for on-premise environments.
 
-This repository is built for installations that must work without Internet access on the target site.
+This project is built for installations that need to work without Internet access on the target site.
 
-## What this is for
+## Why this exists
 
-Use it when you need an internal secret manager that can be:
+Sometimes a team just needs a reliable internal secret manager that can be:
 - deployed fully offline
 - kept on a private network
 - exposed only over internal HTTPS
 - handed over with clear and repeatable steps
 
-The goal is to provide a solid, practical base for a small team, not a full enterprise platform.
+This repository is meant to provide that kind of base: simple, practical, and easy to operate.
 
 ## What is included
 
@@ -97,10 +97,10 @@ For production, provide:
 - `certs/passbolt.crt`
 - `certs/passbolt.key`
 
-These should match `PASSBOLT_FQDN` and come from the customer's internal PKI when possible.
+These files should match `PASSBOLT_FQDN` and ideally come from the customer's internal PKI.
 
 If no certificate files are present, `preflight.sh` generates a local self-signed certificate automatically.
-That fallback is useful for lab, demo, or validation use. It should be replaced before production handover.
+That fallback is useful for lab, demo, or validation use, but it should be replaced before production handover.
 
 ### 4. Install
 
@@ -158,8 +158,7 @@ See `docs/no-internet-egress.md`.
 
 ## Limits
 
-This is a focused V1.
-
+This is a focused V1:
 - no directory integration or SSO
 - no built-in backup workflow
 - no automatic certificate rotation
