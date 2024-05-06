@@ -1,18 +1,40 @@
 # offline-passbolt
 
-A small offline Passbolt CE stack for on-premise environments.
+<p align="center">
+  <strong>Offline Passbolt CE stack for on-premise secret management</strong>
+</p>
 
-This project is built for installations that need to work without Internet access on the target site.
+<p align="center">
+  Built for environments where installation has to work without Internet access.
+</p>
 
-## Why this exists
+<p align="center">
+  <img src="https://img.shields.io/badge/status-ready%20for%20review-8b5cf6?style=flat-square" alt="status" />
+  <img src="https://img.shields.io/badge/offline-ready-111827?style=flat-square" alt="offline ready" />
+  <img src="https://img.shields.io/badge/Passbolt-CE-16a34a?style=flat-square" alt="Passbolt CE" />
+  <img src="https://img.shields.io/badge/Database-MariaDB-1F305F?style=flat-square&logo=mariadb&logoColor=white" alt="MariaDB" />
+  <img src="https://img.shields.io/badge/TLS-internal%20HTTPS-0f766e?style=flat-square" alt="TLS" />
+  <img src="https://img.shields.io/github/license/DavyLss/offline-passbolt?style=flat-square" alt="license" />
+</p>
 
-Sometimes a team just needs a reliable internal secret manager that can be:
-- deployed fully offline
-- kept on a private network
-- exposed only over internal HTTPS
-- handed over with clear and repeatable steps
+---
 
-This repository is meant to provide that kind of base: simple, practical, and easy to operate.
+## Overview
+
+This project provides a small internal Passbolt base for teams that need a private secret manager without depending on Internet access at install time.
+
+## Highlights
+
+- fully offline installation flow
+- Passbolt CE in non-root container mode
+- dedicated MariaDB backend
+- internal HTTPS support
+- local self-signed fallback for lab or validation use
+- simple deployment with Docker Compose or Podman Compose
+
+## Typical use case
+
+This stack fits small internal deployments where Passbolt needs to stay on a private network, use internal DNS and TLS, and remain easy to hand over to a customer or operations team.
 
 ## What is included
 
@@ -36,33 +58,16 @@ This repository is meant to provide that kind of base: simple, practical, and ea
 - SSO, LDAP, or directory integration
 - ready-made automated backups
 
-## Typical use case
-
-This stack fits a private internal Passbolt service:
-- hosted on a customer network
-- not exposed to the Internet
-- installed from pre-exported images
-- operated with internal DNS and internal TLS
-
 ## Recommended sizing
 
 Current defaults fit a small team:
-- about 20 to 30 accounts
-- about 5 to 10 simultaneous active users
-- standard Passbolt usage, browsing, sharing, and updating secrets
 
-### Host
-- 4 vCPU
-- 8 GB RAM
-- 100 GB SSD
-
-### Passbolt
-- 2 vCPU max
-- 3 GB RAM max
-
-### MariaDB
-- 1 vCPU max
-- 2 GB RAM max
+| Component | Sizing |
+|---|---|
+| Host | 4 vCPU, 8 GB RAM, 100 GB SSD |
+| Passbolt | 2 vCPU max, 3 GB RAM max |
+| MariaDB | 1 vCPU max, 2 GB RAM max |
+| Team size | about 20 to 30 accounts, 5 to 10 active users |
 
 ## Repository layout
 
