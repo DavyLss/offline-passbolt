@@ -5,7 +5,7 @@
 </p>
 
 <p align="center">
-  Built for environments where installation has to work without Internet access.
+  Small, focused, and built for environments where installation has to work without Internet access.
 </p>
 
 <p align="center">
@@ -14,7 +14,11 @@
   <img src="https://img.shields.io/badge/Passbolt-CE-16a34a?style=flat-square" alt="Passbolt CE" />
   <img src="https://img.shields.io/badge/Database-MariaDB-1F305F?style=flat-square&logo=mariadb&logoColor=white" alt="MariaDB" />
   <img src="https://img.shields.io/badge/TLS-internal%20HTTPS-0f766e?style=flat-square" alt="TLS" />
-  <img src="https://img.shields.io/github/license/DavyLss/offline-passbolt?style=flat-square" alt="license" />
+  <img src="https://img.shields.io/badge/license-MIT-22c55e?style=flat-square" alt="license" />
+</p>
+
+<p align="center">
+  <sub>Made for private deployments, offline delivery, and straightforward operations.</sub>
 </p>
 
 ---
