@@ -18,6 +18,12 @@
 </p>
 
 <p align="center">
+  <img src="https://img.shields.io/github/stars/DavyLss/offline-passbolt?style=flat-square" alt="stars" />
+  <img src="https://img.shields.io/github/last-commit/DavyLss/offline-passbolt?style=flat-square" alt="last commit" />
+  <img src="https://img.shields.io/github/repo-size/DavyLss/offline-passbolt?style=flat-square" alt="repo size" />
+</p>
+
+<p align="center">
   <sub>Made for private deployments, offline delivery, and straightforward operations.</sub>
 </p>
 
