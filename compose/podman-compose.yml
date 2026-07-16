@@ -15,7 +15,7 @@ services:
       - passbolt_db:/var/lib/mysql:Z
     networks:
       - passbolt_backend
-
+ 
   passbolt:
     image: ${PASSBOLT_IMAGE}
     container_name: passbolt
